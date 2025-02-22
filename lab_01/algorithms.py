@@ -51,7 +51,7 @@ def prepare_hermite_points(data: Points, max_derivative_order: int) -> Points:
     return result
 
 
-def hermite_divided_diffs(data: List[InterpolationPoint]) -> list:
+def hermite_divided_diffs(data: Points) -> list:
     n = len(data)
     coefficients = [point.y for point in data]
 
