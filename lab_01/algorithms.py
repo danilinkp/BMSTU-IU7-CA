@@ -18,7 +18,10 @@ def interpolate_newton(x_value: float, n: int, data: Points) -> float:
     work_points = select_points(index, n, data)
     diffs = newton_divided_diffs(work_points)
 
-    return interpolate_value(x_value, diffs, work_points)
+    # print("Таблица разделенных разностей для полинома Ньютона.")
+    # print_diffs_tables(diffs)
+
+    return interpolate_value(x_value, diffs[0][1:], work_points)
 
 
 def interpolate_hermite(x_value: float, n: int, data: Points, max_derivative_order: int = 2) -> float:
@@ -27,7 +30,10 @@ def interpolate_hermite(x_value: float, n: int, data: Points, max_derivative_ord
     hermite_points = prepare_hermite_points(work_points, max_derivative_order)
     diffs = hermite_divided_diffs(hermite_points)
 
-    return interpolate_value(x_value, diffs, hermite_points)
+    # print("Таблица разделенных разностей для полинома Эрмита.")
+    # print_diffs_tables(diffs)
+
+    return interpolate_value(x_value, diffs[0][1:], hermite_points)
 
 
 def interpolate_value(x_value: float, diffs: list, data: Points) -> float:
@@ -42,43 +48,44 @@ def interpolate_value(x_value: float, diffs: list, data: Points) -> float:
 def prepare_hermite_points(data: Points, max_derivative_order: int) -> Points:
     result = []
     for point in data:
-        result.append(InterpolationPoint(point.x, point.y))
+        result.append(InterpolationPoint(point.x, point.y, point.derivative, point.second_derivative))
         if max_derivative_order >= 1 and point.derivative is not None:
-            result.append(InterpolationPoint(point.x, point.y, point.derivative))
+            result.append(InterpolationPoint(point.x, point.y, point.derivative, point.second_derivative))
         if max_derivative_order >= 2 and point.second_derivative is not None:
             result.append(InterpolationPoint(point.x, point.y, point.derivative, point.second_derivative))
-
     return result
 
 
 def hermite_divided_diffs(data: Points) -> list:
     n = len(data)
-    coefficients = [point.y for point in data]
+
+    table = [[0.0] * (n + 1) for _ in range(n + 1)]
+    table[0] = [point.x for point in data]
+    table[1] = [point.y for point in data]
 
     for j in range(1, n):
-        for i in range(n - 1, j - 1, -1):
-            if data[i].x == data[i - j].x:
+        for i in range(n - j):
+            if table[0][i + j] == table[0][i]:
                 if j == 1 and data[i].derivative is not None:
-                    coefficients[i] = data[i].derivative
+                    table[j + 1][i] = data[i].derivative
                 elif j == 2 and data[i].second_derivative is not None:
-                    coefficients[i] = data[i].second_derivative / 2
-                else:
-                    coefficients[i] = 0
+                    table[j + 1][i] = data[i].second_derivative / 2
             else:
-                coefficients[i] = (coefficients[i] - coefficients[i - 1]) / (data[i].x - data[i - j].x)
+                table[j + 1][i] = (table[j][i + 1] - table[j][i]) / (table[0][i + j] - table[0][i])
 
-    return coefficients
+    return list(zip(*table))
 
 
 def newton_divided_diffs(data: Points) -> list:
     n = len(data)
-    coefficients = [data[i].y for i in range(n)]
+    newton_table = [[point.x for point in data], [point.y for point in data]]
 
-    for j in range(1, n):
-        for i in range(n - 1, j - 1, -1):
-            coefficients[i] = (coefficients[i] - coefficients[i - 1]) / (data[i].x - data[i - j].x)
+    for i in range(1, n):
+        newton_table.append([0] * n)
+        for j in range(n - i):
+            newton_table[i + 1][j] = (newton_table[i][j + 1] - newton_table[i][j]) / (data[j + i].x - data[j].x)
 
-    return coefficients
+    return list(zip(*newton_table))
 
 
 def select_points(index: int, n: int, data: Points) -> Points:
@@ -118,6 +125,7 @@ def generate_table(data: Points, x_value: float, max_degree: int) -> None:
         newton_result = interpolate_newton(x_value, n, data)
         hermite_result = interpolate_hermite(x_value, n, data)
         table.add_row([n, newton_result, hermite_result])
+    table.float_format = '.3'
     print(table)
 
 
@@ -154,4 +162,20 @@ def print_points(data: Points) -> None:
     table.align = "r"
     for point in data:
         table.add_row([point.x, point.y])
+    table.float_format = '.3'
+    print(table)
+
+
+def print_diffs_tables(data: list) -> None:
+    table = PrettyTable()
+    headers = ["x", "y"] + [f"Разность {i}" for i in range(len(data) - 1)]
+
+    table.field_names = headers
+    table.align = "r"
+
+    for i in range(len(data)):
+        row = list(data[i][:len(data) - i + 1]) + [""] * i
+        table.add_row(row)
+
+    table.float_format = '.3'
     print(table)

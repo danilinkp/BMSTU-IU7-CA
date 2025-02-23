@@ -39,40 +39,24 @@ def main() -> None:
     print(f"Корень табличной функции с помощью обратной интерполяции полином Ньютона: {root_by_newton}")
     print(f"Корень табличной функции с помощью обратной интерполяции полином Эрмита: {root_by_hermite}\n")
 
+    print("Решение системы нелинейных уравнений")
     data_func_1_y_x = read_points("data/func_y_x.txt")
     data_func_2_x_y = read_points("data/func_x_y.txt")
 
     n = 4
     func_1_x_y = reverse_data(data_func_1_y_x)
 
-    new_data_func_1_x_y: Points = []
-    for point in data_func_2_x_y:
-        new_data_func_1_x_y.append(InterpolationPoint(point.x, interpolate_newton(point.x, n, func_1_x_y)))
-
-    new_data_func_2_x_y: Points = []
-    for point in func_1_x_y:
-        new_data_func_2_x_y.append(InterpolationPoint(point.x, interpolate_newton(point.x, n, data_func_2_x_y)))
-
     new_data_solve: Points = []
-    for i in range(len(new_data_func_1_x_y)):
-        point = InterpolationPoint(new_data_func_1_x_y[i].x, new_data_func_1_x_y[i].y - data_func_2_x_y[i].y)
-        new_data_solve.append(point)
+    for i, point in enumerate(data_func_2_x_y):
+        f1_x = point.y
+        f2_inv_x = interpolate_newton(point.x, n, func_1_x_y)
+        f_x = f1_x - f2_inv_x
+        new_data_solve.append(InterpolationPoint(point.x, f_x))
 
-    new_data_solve_2: Points = []
-    for i in range(len(new_data_func_2_x_y)):
-        point = InterpolationPoint(func_1_x_y[i].x, func_1_x_y[i].y - new_data_func_2_x_y[i].y)
-        new_data_solve_2.append(point)
-
-    solve_1 = find_root_by_newton(new_data_solve, 3)
-    solve_2 = find_root_by_newton(new_data_solve_2, 3)
-    print(f"Первое решение системы: {solve_1}")
-    print(f"Второе решение системы: {solve_2}")
-
-    print("data solve 1")
     print_points(new_data_solve)
 
-    print("data solve 2")
-    print_points(new_data_solve_2)
+    solve_1 = find_root_by_newton(new_data_solve, n)
+    print(f"Решение системы: x = {solve_1:.6f}")
 
 
 if __name__ == "__main__":
