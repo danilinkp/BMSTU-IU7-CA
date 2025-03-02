@@ -1,6 +1,6 @@
 from algorithms import InterpolationPoint, Points
 from algorithms import interpolate_newton, interpolate_hermite
-from algorithms import generate_table, print_points
+from algorithms import generate_table, print_points, print_hermite_div_diffs, print_newton_div_diffs
 from algorithms import reverse_data, find_root_by_newton, find_root_by_hermite
 
 FILEPATH = "data/data.txt"
@@ -25,10 +25,15 @@ def main() -> None:
     x_value = float(input("Введите значение x: "))
     n = int(input("Введите n: "))
 
+    n2 = int(input("Введите кол-во узлов для полинома Эрмита: "))
+
     data = read_points(FILEPATH)
 
+    print_newton_div_diffs(x_value, n, data)
+    print_hermite_div_diffs(x_value, n2 - 1, data)
+
     print(f"Интерполяция полиномом Ньютона: {interpolate_newton(x_value, n, data)}")
-    print(f"Интерполяция полиномом Эрмита: {interpolate_hermite(x_value, n, data)}")
+    print(f"Интерполяция полиномом Эрмита: {interpolate_hermite(x_value, n2 - 1, data)}")
     print("---------------\n")
 
     generate_table(data, x_value, 5)

@@ -18,9 +18,6 @@ def interpolate_newton(x_value: float, n: int, data: Points) -> float:
     work_points = select_points(index, n, data)
     diffs = newton_divided_diffs(work_points)
 
-    # print("Таблица разделенных разностей для полинома Ньютона.")
-    # print_diffs_tables(diffs)
-
     return interpolate_value(x_value, diffs[0][1:], work_points)
 
 
@@ -29,9 +26,6 @@ def interpolate_hermite(x_value: float, n: int, data: Points, max_derivative_ord
     work_points = select_points(index, n, data)
     hermite_points = prepare_hermite_points(work_points, max_derivative_order)
     diffs = hermite_divided_diffs(hermite_points)
-
-    # print("Таблица разделенных разностей для полинома Эрмита.")
-    # print_diffs_tables(diffs)
 
     return interpolate_value(x_value, diffs[0][1:], hermite_points)
 
@@ -179,3 +173,20 @@ def print_diffs_tables(data: list) -> None:
 
     table.float_format = '.3'
     print(table)
+
+
+def print_hermite_div_diffs(x_value: float, n: int, data: Points) -> None:
+    index = find_index(x_value, data)
+    work_points = select_points(index, n, data)
+    hermite_points = prepare_hermite_points(work_points, 2)
+    diffs = hermite_divided_diffs(hermite_points)
+
+    print_diffs_tables(diffs)
+
+
+def print_newton_div_diffs(x_value: float, n: int, data: Points) -> None:
+    index = find_index(x_value, data)
+    work_points = select_points(index, n, data)
+    diffs = newton_divided_diffs(work_points)
+
+    print_diffs_tables(diffs)
