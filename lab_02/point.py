@@ -1,3 +1,5 @@
+from typing import List
+
 class Point:
     def __init__(self, x: float, y: float) -> None:
         self.x = x
@@ -5,3 +7,5 @@ class Point:
 
     def __str__(self) -> str:
         return f"({self.x:.3f} {self.y:.3f})"
+
+type Points = List[Point]
