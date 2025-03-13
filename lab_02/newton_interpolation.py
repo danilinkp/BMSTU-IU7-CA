@@ -45,7 +45,7 @@ class Newton:
         self.diffs = list(zip(*newton_table))
 
     def calc_polynom(self, x_value: float) -> float:
-        n = len(self.data)
+        n = len(self.work_points)
         result = self.diffs[n - 1]
         for i in range(n - 2, -1, -1):
             result = result * (x_value - self.data[i].x) + self.diffs[i]
@@ -59,3 +59,5 @@ class Newton:
         self.diffs = self.diffs[0][1:]
 
         return self.calc_polynom(x_value)
+
+
