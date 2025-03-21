@@ -1,5 +1,7 @@
 import numpy as np
 
+from pprint import pprint
+
 from typing import Optional
 from point import Point
 from newton_interpolation import Newton
@@ -14,12 +16,16 @@ def interpolate_x(x: float, data: np.ndarray, f_yz: dict, interp_type: str, nx: 
     for k in range(len(z_vals)):
         for j in range(len(y_vals)):
             points_x = [Point(x_vals[i], float(data[k, j, i])) for i in range(len(x_vals))]
+            for point in points_x:
+                print(point.x, point.y)
             if interp_type == "newton":
                 newton_x = Newton(points_x)
                 f_yz[(j, k)] = newton_x.interpolate(x, nx)
             else:
                 spline_x = Spline(points_x)
                 f_yz[(j, k)] = spline_x.evaluate(x)
+
+    pprint(f_yz)
 
 
 def interpolate_y(y: float, f_z: dict, f_yz: dict, interp_type: str, ny: Optional[int]):
@@ -35,11 +41,13 @@ def interpolate_y(y: float, f_z: dict, f_yz: dict, interp_type: str, ny: Optiona
             spline_y = Spline(points_y)
             f_z[k] = spline_y.evaluate(y)
 
+    pprint(f_z)
 
 def interpolate_z(z: float, f_z: dict, interp_type: str, nz: Optional[int]) -> float:
     z_vals = [0, 1, 2, 3, 4]
 
     points_z = [Point(z_vals[k], f_z[k]) for k in range(len(z_vals))]
+
     if interp_type == "newton":
         newton_z = Newton(points_z)
         result = newton_z.interpolate(z, nz)
