@@ -2,7 +2,7 @@ import numpy as np
 
 
 def newton_method(function: callable, jacobi: callable, x0: np.ndarray, eps: float = 1e-6,
-                  max_iter: int = 10) -> np.ndarray:
+                  max_iter: int = 30) -> np.ndarray:
     x = x0.copy()
     iter_count = 0
 
