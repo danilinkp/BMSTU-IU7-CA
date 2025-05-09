@@ -93,7 +93,9 @@ def gauss_method(function: callable, x_start: float, x_end: float, n: int) -> fl
     shift = (a + b) / 2
     transformed_roots = scale * roots + shift
 
-    result = scale * np.sum(weights * function(transformed_roots))
+    result = 0.0
+    for x, w in zip(transformed_roots, weights):
+        result += w * function(x)
 
-    return result
+    return scale * result
 
